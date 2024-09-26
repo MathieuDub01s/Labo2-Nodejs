@@ -1,21 +1,27 @@
+import queryString from "query-string";
+
 export default class Controller {
     constructor(HttpContext, repository = null) {
         this.HttpContext = HttpContext;
         this.repository = repository;
     }
-    get(id) {
-            if (id !== undefined) {
-                if (!isNaN(id)) {
-                    let data = this.repository.get(id);
-                    if (data)
-                        this.HttpContext.response.JSON(data);
-                    else
-                        this.HttpContext.response.notFound("Ressource not found.");
-                } else
-                    this.HttpContext.response.badRequest("The Id in the request url is rather not specified or syntactically wrong.");
+    get(query) {
+            if(query == " "){
+
             }
-            else
-                this.HttpContext.response.JSON(this.repository.getAll());
+            // if (id !== undefined) {
+            //     if (!isNaN(id)) {
+            //         let data = this.repository.get(id);
+            //         if (data)
+            //             this.HttpContext.response.JSON(data);
+            //         else
+            //             this.HttpContext.response.notFound("Ressource not found.");
+            //     } else
+            //         this.HttpContext.response.badRequest("The Id in the request url is rather not specified or syntactically wrong.");
+            // }
+            // else
+            //    this.HttpContext.response.JSON(this.repository.getAll());
+            this.HttpContext.response.JSON(query);
     }
     post(data) {
         data = this.repository.add(data);
