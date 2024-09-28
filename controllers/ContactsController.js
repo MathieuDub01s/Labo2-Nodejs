@@ -4,6 +4,6 @@ import Controller from './Controller.js';
 
 export default class ContactsController extends Controller {
     constructor(HttpContext) {
-        super(HttpContext, new Repository(new ContactModel()));
+        super(HttpContext, null);
     }
 }

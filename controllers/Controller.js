@@ -5,8 +5,10 @@ export default class Controller {
         this.HttpContext = HttpContext;
         this.repository = repository;
     }
-    get(query) {
-            if(query == " "){
+    get() {
+            if(this.HttpContext.path.queryString == '?'){
+                this.HttpContext.response.JSON('wwwroot/404.html');
+            }else if(this.HttpContext.path.params){
 
             }
             // if (id !== undefined) {
@@ -21,7 +23,7 @@ export default class Controller {
             // }
             // else
             //    this.HttpContext.response.JSON(this.repository.getAll());
-            this.HttpContext.response.JSON(query);
+            this.HttpContext.response.JSON(queryString);
     }
     post(data) {
         data = this.repository.add(data);
