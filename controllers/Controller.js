@@ -1,6 +1,8 @@
 import queryString from "query-string";
 import { factorial, isPrime, findPrime } from "../mathUtilities.js";
 
+import fs from 'fs';
+import path from 'path';
 export default class Controller {
     constructor(HttpContext, repository = null) {
         this.HttpContext = HttpContext;
@@ -54,7 +56,8 @@ export default class Controller {
         let parameters = this.HttpContext.path.params;
         let errors = this.errorHandling(parameters.op,parameters.x,parameters.y, parameters.n);
         if(query == '?'){
-            this.HttpContext.response.JSON('wwwroot/404.html');
+            let content = path.join(process.cwd(), wwwroot,"API-Help-Pages/API-Maths-Help.html");
+            this.HttpContext.response.HTML(fs.readFileSync(content));
         }else{
             if(errors == null || parameters.op == '!' || parameters.op == 'p' || parameters.op == 'np'){
                  this.operationMathUtilities(parameters.op, parameters.n);
