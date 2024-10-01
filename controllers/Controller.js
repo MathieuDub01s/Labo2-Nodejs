@@ -1,5 +1,6 @@
 import queryString from "query-string";
 import fs from 'fs';
+import path from 'path';
 export default class Controller {
     constructor(HttpContext, repository = null) {
         this.HttpContext = HttpContext;
@@ -42,8 +43,8 @@ export default class Controller {
         let parameters = this.HttpContext.path.params;
         let errors = this.errorHandling(parameters.op,parameters.x,parameters.y);
         if(query == '?'){
-            content = path.join(process.cwd(), wwwroot,"API-Help-Pages/API-Maths-Help.html" );
-            this.HttpContext.response.HTML(content);
+            let content = path.join(process.cwd(), wwwroot,"API-Help-Pages/API-Maths-Help.html");
+            this.HttpContext.response.HTML(fs.readFileSync(content));
         }else{
             if(errors == null){
                     this.operation(parameters.op, parameters.x, parameters.y);
