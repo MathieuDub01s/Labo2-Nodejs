@@ -38,7 +38,7 @@ export default class Controller {
     }
     errorHandling(operator, valueX, valueY, valueN){    
         let error =  null;
-        if (operator != '!' || operator != 'p' || operator != 'np') {
+        if (operator != '!' && operator != 'p' && operator != 'np') {
             if (isNaN(valueX)) {
                 error = "x parameter is not a number";
             } else if (isNaN(valueY)) {
@@ -59,7 +59,7 @@ export default class Controller {
             let content = path.join(process.cwd(), wwwroot,"API-Help-Pages/API-Maths-Help.html");
             this.HttpContext.response.HTML(fs.readFileSync(content));
         }else{
-            if(errors == null || parameters.op == '!' || parameters.op == 'p' || parameters.op == 'np'){
+            if(errors == null && (parameters.op == '!' || parameters.op == 'p' || parameters.op == 'np')){
                  this.operationMathUtilities(parameters.op, parameters.n);
             }else if(errors == null){
                 this.operation(parameters.op, parameters.x, parameters.y);
