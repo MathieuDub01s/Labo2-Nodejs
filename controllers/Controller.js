@@ -19,6 +19,12 @@ export default class Controller {
             result = x / y;
         }else if(operator == '%'){
             result = x%y;
+        }else if(operator == '!'){
+            
+        }else if(operator == 'p'){
+
+        }else if(operator == 'np'){
+
         }
         this.HttpContext.response.JSON(result);
     }
