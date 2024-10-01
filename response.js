@@ -41,6 +41,7 @@ export default class Response {
     HTML(content) {
         this.res.writeHead(200, { 'content-type': 'text/html' });
         return this.end(content);
+   
     }
     accepted() { return this.status(202); } // accepted status
     deleted() { return this.status(202); }  // accepted status
