@@ -5,23 +5,52 @@ export default class Controller {
         this.HttpContext = HttpContext;
         this.repository = repository;
     }
-    get(query) {
-            if(query == " "){
+    operation(operator, valueX, valueY){    
+        let x = parseFloat(valueX);
+        let y = parseFloat(valueY);
+        let result = null;
+        if(operator == ' '){
+            result = x + y;
+        }else if(operator == '-'){
+            result = x - y;
+        }else if(operator == '*'){
+            result = x * y;
+        }else if(operator == '/'){
+            result = x / y;
+        }else if(operator == '%'){
+            result = x%y;
+        }else if(operator == '!'){
+            
+        }else if(operator == 'p'){
 
+        }else if(operator == 'np'){
+
+        }
+        this.HttpContext.response.JSON(result);
+    }
+    errorHandling(operator, valueX, valueY){    
+        let error =  null;
+        if(isNaN(valueX)){
+            error = "x parameter is not a number";
+        }else if(isNaN(valueY)){
+            error = "y parameter is not a number";
+        }
+        return error;
+    }
+    get() {
+        let query = this.HttpContext.path.queryString;
+        let parameters = this.HttpContext.path.params;
+        let errors = this.errorHandling(parameters.op,parameters.x,parameters.y);
+        if(query == '?'){
+            this.HttpContext.response.JSON('wwwroot/404.html');
+        }else{
+            if(errors == null){
+                    this.operation(parameters.op, parameters.x, parameters.y);
+
+            }else{
+                this.HttpContext.response.JSON(errors);
             }
-            // if (id !== undefined) {
-            //     if (!isNaN(id)) {
-            //         let data = this.repository.get(id);
-            //         if (data)
-            //             this.HttpContext.response.JSON(data);
-            //         else
-            //             this.HttpContext.response.notFound("Ressource not found.");
-            //     } else
-            //         this.HttpContext.response.badRequest("The Id in the request url is rather not specified or syntactically wrong.");
-            // }
-            // else
-            //    this.HttpContext.response.JSON(this.repository.getAll());
-            this.HttpContext.response.JSON(query);
+        }
     }
     post(data) {
         data = this.repository.add(data);
