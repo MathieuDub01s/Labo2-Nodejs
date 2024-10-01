@@ -35,15 +35,16 @@ export default class Controller {
         let query = this.HttpContext.path.queryString;
         let parameters = this.HttpContext.path.params;
         let errors = this.errorHandling(parameters.op,parameters.x,parameters.y);
+        if(query == '?'){
+            this.HttpContext.response.JSON('wwwroot/404.html');
+        }else{
             if(errors == null){
-                if(query == '?'){
-                    this.HttpContext.response.JSON('wwwroot/404.html');
-                }else{
                     this.operation(parameters.op, parameters.x, parameters.y);
-                }
+
             }else{
                 this.HttpContext.response.JSON(errors);
             }
+        }
     }
     post(data) {
         data = this.repository.add(data);
