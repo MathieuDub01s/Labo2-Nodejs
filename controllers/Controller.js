@@ -8,45 +8,68 @@ export default class Controller {
         this.HttpContext = HttpContext;
         this.repository = repository;
     }
-    operation(operator, valueX, valueY) {
+    operation(operator, valueX, valueY, valueN, errors) {
         let x = parseFloat(valueX);
         let y = parseFloat(valueY);
-        let result = null;
-        if (operator == ' ') {
-            result = x + y;
-        } else if (operator == '-') {
-            result = x - y;
-        } else if (operator == '*') {
-            result = x * y;
-        } else if (operator == '/') {
-            result = x / y;
-        } else if (operator == '%') {
-            result = x % y;
+        let result= "";
+        if (errors == null) {
+            if (valueN == null) {
+                if (operator == ' ') {
+                    result = x + y;
+                } else if (operator == '-') {
+                    result = x - y;
+                } else if (operator == '*') {
+                    result = x * y;
+                } else if (operator == '/') {
+
+                    result = x / y;
+                } else if (operator == '%') {
+                    result = x % y;
+                }
+            } else {
+                if (operator == '!') {
+                    result = factorial(valueN);
+                } else if (operator == 'p') {
+                    result = isPrime(valueN);
+                } else if (operator == 'np') {
+                    result = findPrime(valueN);
+                }
+            }
         }
-        return result;
+        return result.toString();
     }
-    operationMathUtilities(operator, valueN) {
-        let result = null;
-        if (operator == '!') {
-            result = factorial(valueN);
-        } else if (operator == 'p') {
-            result = isPrime(valueN);
-        } else if (operator == 'np') {
-            result = findPrime(valueN);
-        }
-        return result;
-    }
-    errorHandling(operator, valueX, valueY, valueN) {
+    
+    errorHandling(parameters) {
+        let operator = parameters.op;
+        let valueN = parseFloat(parameters.n);
+        let valueX = parseFloat(parameters.x);
+        let valueY = parseFloat(parameters.y);
+
         let error = null;
+        
         if (operator != '!' && operator != 'p' && operator != 'np') {
-            if (isNaN(valueX)) {
+            if (typeof valueX != Number) {
                 error = "x parameter is not a number";
-            } else if (isNaN(valueY)) {
+            } else if (isNaN(valueY) ) {
                 error = "y parameter is not a number";
+            } else if(isNaN(valueX)){
+                error = "x parameter is missing";
+            } else if(isNaN(valueY)){
+                error = "y parameter is missing";
+            } else if (parameters.length >=4  ){
+                error = "too many parameters";
             }
         } else {
-            if (isNaN(valueN)) {
+            if (isNaN(valueN) && valueN !=null) {
                 error = "n parameter is not a number";
+            }else if (valueN <=0 || !Number.isInteger(valueN) ){
+                error = "n parameter must be an integer > 0";
+            }else if (valueN ==null){
+                error = "n parameter is missing";
+            }else if (parameters.length >=3){
+                error = "too many parameters";
+            }else if (operator==null){
+                error="op parameter is missing";
             }
         }
         return error;
@@ -55,8 +78,40 @@ export default class Controller {
         if (operator == " ") {
             operator = "+";
         }
+
         let obj = null;
-        if (error != null) {
+        if(error ==null){  //pas d'erreurs
+            if(n ==null){   //si c'est pas n
+                obj = {
+                    "op": operator,
+                    "x": x,
+                    "y": y,
+                    "value": resultat,
+                }
+            }else {     //si c'est n
+                obj = {
+                    "n": n,
+                    "op": operator,
+                    "value": resultat,
+                }
+            }
+        }else{             //des erreurs
+            if(n ==null){   //si c'est pas n
+                obj = {
+                    "op": operator,
+                    "x": x,
+                    "y": y,
+                    "error": error,
+                }
+            }else {     //si c'est n
+                obj = {
+                    "n": n,
+                    "op": operator,
+                    "error": error,
+                }
+            }
+        }
+       /* if (error != null && n==null) {  //calcul avec x & y
             obj = {
                 "op": operator,
                 "x": x,
@@ -65,11 +120,18 @@ export default class Controller {
             }
         }
         else if (n != null) {
+            if(error != null){
+                obj = {
+                    "n": n,
+                    "op": operator,
+                    "error": error,
+                }
+            }else{
             obj = {
                 "n": n,
                 "op": operator,
                 "value": resultat,
-            }
+            }}
         }
         else {
             obj = {
@@ -78,25 +140,26 @@ export default class Controller {
                 "y": y,
                 "value": resultat,
             }
-        }
+        }*/
         return obj;
     }
     get() {
         let query = this.HttpContext.path.queryString;
         let parameters = this.HttpContext.path.params;
-        let errors = this.errorHandling(parameters.op, parameters.x, parameters.y, parameters.n);
-        if (query == '?') {
+        let errors = this.errorHandling(parameters);
+        if (query == '?') {   //affiche html
             let content = path.join(process.cwd(), wwwroot, "API-Help-Pages/API-Maths-Help.html");
             this.HttpContext.response.HTML(fs.readFileSync(content));
-        } else {
-            if (errors == null && (parameters.op == '!' || parameters.op == 'p' || parameters.op == 'np')) {
-                this.HttpContext.response.JSON(this.resultHandling(parameters.op, null, null, parameters.n, this.operationMathUtilities(parameters.op, parameters.n), errors));
-            } else if (errors == null) {
+        } else {     //calculs
+            //if (errors == null){// && (parameters.op == '!' || parameters.op == 'p' || parameters.op == 'np')) {
+            this.HttpContext.response.JSON(this.resultHandling(parameters.op,  parameters.x, parameters.y, parameters.n, this.operation(parameters.op, parameters.x, parameters.y,parameters.n, errors), errors));
+            
+            /*else if (errors == null) {
                 this.HttpContext.response.JSON(this.resultHandling(parameters.op, parameters.x, parameters.y, null, this.operation(parameters.op, parameters.x, parameters.y), errors));
-            }
-            else {
-                this.HttpContext.response.JSON(this.resultHandling(parameters.op, parameters.x, parameters.y, errors));
-            }
+            }else if(parameters.n != null && errors != null){
+                this.HttpContext.response.JSON(this.resultHandling(parameters.op, parameters.x, parameters.y, parameters.n, this.operationMathUtilities(parameters.op, parameters.n),errors));
+            }*/
+            
         }
     }
     post(data) {
