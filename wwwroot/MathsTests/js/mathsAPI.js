@@ -3,7 +3,11 @@ async function web_API_getMaths(host, path, callback) {
         const response = await fetch(`${host}${path}`);
         const data = await response.json();
         callback(data);
+        let verdict = document.getElementById("verdict");
+        verdict.innerHTML = "Bravo! Aucun problème";
     } catch (error) {
+       
+        verdict.innerHTML = "Oups";
         console.error('Error fetching data:', error);
     }
 }
@@ -21,6 +25,7 @@ const start = async function name() {
 
     let divInfos = document.getElementById("maths");
     divInfos.innerHTML= "";
+
     await web_API_getMaths(host, '?op=+&x=-111&y=-224', showResult);
     await web_API_getMaths(host, '?op=-&x=1&y=abc', showResult);
     await web_API_getMaths(host, '?op=-&x=111&y=224', showResult);
