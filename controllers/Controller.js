@@ -44,19 +44,21 @@ export default class Controller {
         let valueN = parseFloat(parameters.n);
         let valueX = parseFloat(parameters.x);
         let valueY = parseFloat(parameters.y);
-
+        let paramLength = Object.keys(parameters).length;
         let error = null;
-        
+        if(operator == null){
+            error = "'op'parameter is missing";
+        }else
         if (operator != '!' && operator != 'p' && operator != 'np') {
-            if (typeof valueX != Number) {
-                error = "x parameter is not a number";
-            } else if (isNaN(valueY) ) {
-                error = "y parameter is not a number";
-            } else if(isNaN(valueX)){
+            if (parameters.x == null) {
                 error = "x parameter is missing";
-            } else if(isNaN(valueY)){
+            } else if (parameters.y == null) {
                 error = "y parameter is missing";
-            } else if (parameters.length >=4  ){
+            } else if(isNaN(valueX)){
+                error = "x parameter is not a number";
+            } else if(isNaN(valueY)){
+                error = "y parameter is not a number";
+            } else if (paramLength > 3  ){
                 error = "too many parameters";
             }
         } else {
@@ -66,7 +68,7 @@ export default class Controller {
                 error = "n parameter must be an integer > 0";
             }else if (valueN ==null){
                 error = "n parameter is missing";
-            }else if (parameters.length >=3){
+            }else if (paramLength > 2){
                 error = "too many parameters";
             }else if (operator==null){
                 error="op parameter is missing";
