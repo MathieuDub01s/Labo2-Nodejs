@@ -36,18 +36,31 @@ export default class Controller {
                 }
             }
         }
-        return result.toString();
+        if(isNaN(result) || result == "Infinity" ){
+            result = result.toString();
+        }
+      
+        return result;
     }
     
     errorHandling(parameters) {
         let operator = parameters.op;
-        let valueN = parseFloat(parameters.n);
-        let valueX = parseFloat(parameters.x);
-        let valueY = parseFloat(parameters.y);
+        let valueN = parameters.n;
+        let valueX = parameters.x;
+        let valueY = parameters.y;
+        if(!isNaN(parameters.x)){
+            valueX = parseFloat(parameters.x);
+        }
+        if (!isNaN(parameters.y)){
+            valueY  = parseFloat(parameters.y);
+        }
+        if (!isNaN(parameters.n)){
+            valueN = parseFloat(parameters.n);
+        }
         let paramLength = Object.keys(parameters).length;
         let error = null;
         if(operator == null){
-            error = "'op'parameter is missing";
+            error = "'op' parameter is missing";
         }else
         if (operator != '!' && operator != 'p' && operator != 'np') {
             if (parameters.x == null) {
@@ -62,99 +75,50 @@ export default class Controller {
                 error = "too many parameters";
             }
         } else {
-            if (isNaN(valueN) && valueN !=null) {
+            if (parameters.n ==null){
+                error = "n parameter is missing";
+            }
+            else if (isNaN(valueN) && valueN !=null) {
                 error = "n parameter is not a number";
             }else if (valueN <=0 || !Number.isInteger(valueN) ){
                 error = "n parameter must be an integer > 0";
-            }else if (valueN ==null){
-                error = "n parameter is missing";
             }else if (paramLength > 2){
                 error = "too many parameters";
-            }else if (operator==null){
-                error="op parameter is missing";
             }
         }
         return error;
     }
-    resultHandling(operator, x, y, n, resultat, error) {
-        if (operator == " ") {
-            operator = "+";
+    resultHandling(parameters, result, error) {
+       
+        let obj = {};
+        if (parameters.op== " ") {
+            parameters.op = "+";
         }
-
-        let obj = null;
-        if(error ==null){  //pas d'erreurs
-            if(n ==null){   //si c'est pas n
-                obj = {
-                    "op": operator,
-                    "x": x,
-                    "y": y,
-                    "value": resultat,
-                }
-            }else {     //si c'est n
-                obj = {
-                    "n": n,
-                    "op": operator,
-                    "value": resultat,
-                }
+        for (let [key, value] of Object.entries(parameters)) {       
+            if(!isNaN(value)){
+                value = parseFloat(value);
             }
-        }else{             //des erreurs
-            if(n ==null){   //si c'est pas n
-                obj = {
-                    "op": operator,
-                    "x": x,
-                    "y": y,
-                    "error": error,
-                }
-            }else {     //si c'est n
-                obj = {
-                    "n": n,
-                    "op": operator,
-                    "error": error,
-                }
-            }
+            obj[key] = value;
         }
-       /* if (error != null && n==null) {  //calcul avec x & y
-            obj = {
-                "op": operator,
-                "x": x,
-                "y": y,
-                "error": error,
-            }
+        if(error==null){
+            obj["value"] = result;
+        }else{
+            obj["error"] = error;
         }
-        else if (n != null) {
-            if(error != null){
-                obj = {
-                    "n": n,
-                    "op": operator,
-                    "error": error,
-                }
-            }else{
-            obj = {
-                "n": n,
-                "op": operator,
-                "value": resultat,
-            }}
-        }
-        else {
-            obj = {
-                "op": operator,
-                "x": x,
-                "y": y,
-                "value": resultat,
-            }
-        }*/
+       
         return obj;
     }
     get() {
         let query = this.HttpContext.path.queryString;
         let parameters = this.HttpContext.path.params;
+        
         let errors = this.errorHandling(parameters);
         if (query == '?') {   //affiche html
             let content = path.join(process.cwd(), wwwroot, "API-Help-Pages/API-Maths-Help.html");
             this.HttpContext.response.HTML(fs.readFileSync(content));
         } else {     //calculs
             //if (errors == null){// && (parameters.op == '!' || parameters.op == 'p' || parameters.op == 'np')) {
-            this.HttpContext.response.JSON(this.resultHandling(parameters.op,  parameters.x, parameters.y, parameters.n, this.operation(parameters.op, parameters.x, parameters.y,parameters.n, errors), errors));
+            this.HttpContext.response.JSON(this.resultHandling(parameters, this.operation(parameters.op, parameters.x, parameters.y,parameters.n, errors), errors));
             
             /*else if (errors == null) {
                 this.HttpContext.response.JSON(this.resultHandling(parameters.op, parameters.x, parameters.y, null, this.operation(parameters.op, parameters.x, parameters.y), errors));
@@ -165,41 +129,12 @@ export default class Controller {
         }
     }
     post(data) {
-        data = this.repository.add(data);
-        if (this.repository.model.state.isValid) {
-            this.HttpContext.response.created(data);
-        } else {
-            if (this.repository.model.state.inConflict)
-                this.HttpContext.response.conflict(this.repository.model.state.errors);
-            else
-                this.HttpContext.response.badRequest(this.repository.model.state.errors);
-        }
+        this.HttpContext.response.forbidden("Ce service n'est pas supporté");
     }
     put(data) {
-        if (!isNaN(this.HttpContext.path.id)) {
-            this.repository.update(this.HttpContext.path.id, data);
-            if (this.repository.model.state.isValid) {
-                this.HttpContext.response.ok();
-            } else {
-                if (this.repository.model.state.notFound) {
-                    this.HttpContext.response.notFound(this.repository.model.state.errors);
-                } else {
-                    if (this.repository.model.state.inConflict)
-                        this.HttpContext.response.conflict(this.repository.model.state.errors)
-                    else
-                        this.HttpContext.response.badRequest(this.repository.model.state.errors);
-                }
-            }
-        } else
-            this.HttpContext.response.badRequest("The Id of ressource is not specified in the request url.")
+        this.HttpContext.response.forbidden("Ce service n'est pas supporté");
     }
     remove(id) {
-        if (!isNaN(this.HttpContext.path.id)) {
-            if (this.repository.remove(id))
-                this.HttpContext.response.accepted();
-            else
-                this.HttpContext.response.notFound("Ressource not found.");
-        } else
-            this.HttpContext.response.badRequest("The Id in the request url is rather not specified or syntactically wrong.");
+        this.HttpContext.response.forbidden("Ce service n'est pas supporté");
     }
 }
