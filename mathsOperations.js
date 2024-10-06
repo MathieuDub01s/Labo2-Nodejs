@@ -1,4 +1,4 @@
-import { factorial, isPrime, findPrime } from "mathUtilities.js";
+import { factorial, isPrime, findPrime } from "./mathUtilities.js";
 export function operation(operator, valueX, valueY, valueN, errors) {
     let x = parseFloat(valueX);
     let y = parseFloat(valueY);
