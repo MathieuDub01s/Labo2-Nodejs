@@ -21,8 +21,7 @@ async function showResult(data) {
 
 
 const start = async function name() {
-    let host = document.getElementById('url_id').value;
-
+    let host = document.getElementById('url_id').value + "/api/maths";
     let divInfos = document.getElementById("maths");
     divInfos.innerHTML= "";
 
